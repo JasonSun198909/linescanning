@@ -66,12 +66,12 @@ if __name__ == "__main__":
     digital_trigger_channel = "PFI0"  # Trigger signal on PFI0
 
     mirror_feedfrequency=120
-    scan_freq=mirror_feedfrequency/3
+    scan_freq=int(mirror_feedfrequency/3)
 
     sampling_rate = 200000.0  # Samples per second
-    num_samples = sampling_rate/scan_freq  # Number of samples to acquire after each trigger
+    num_samples = int(sampling_rate/scan_freq) # Number of samples to acquire after each trigger
     trigger_timeout = 5.0  # Timeout in seconds to wait for each trigger
-    num_repetitions = 100  # Number of times to repeat the acquisition
+    num_repetitions = 500  # Number of times to repeat the acquisition
     repetition_to_plot = 1  # The repetition number to plot (1-based index)
     delaytimer=0.01
     

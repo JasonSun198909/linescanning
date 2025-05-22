@@ -81,6 +81,7 @@ if __name__ == "__main__":
     # --- Perform Repeated Acquisition ---
     all_recorded_data = []
     time.sleep(5)
+    
     for i in range(num_repetitions):
         print(f"\n--- Repetition {i+1} ---")
         acquired_data = record_on_low_digital_trigger(

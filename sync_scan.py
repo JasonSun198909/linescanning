@@ -6,7 +6,8 @@ from nidaqmx.constants import (
 )
 import numpy as np
 import matplotlib.pyplot as plt
-import time 
+import time
+from control_laser import control_laser
 
 def record_on_low_digital_trigger(
     data_channel, trigger_line, samples_per_channel, rate, timeout=10.0
@@ -37,7 +38,8 @@ def record_on_low_digital_trigger(
                 trigger_line, trigger_edge=Edge.FALLING
             )
 
-            print(f"Waiting for a low-going digital trigger on {trigger_line}...")
+            print(
+                f"Waiting for a low-going digital trigger on {trigger_line}...")
             task.start()
 
             try:
@@ -64,80 +66,84 @@ if __name__ == "__main__":
     # --- User Configuration ---
     analog_data_channel = "Dev1/ai0"  # Data signal on AI0
     digital_trigger_channel = "PFI0"  # Trigger signal on PFI0
-
-    mirror_feedfrequency=120
-    scan_freq=int(mirror_feedfrequency/3)
+    lasernumber = ["98250937", "98251034"]
+    laserwave=[1450,1550]
+    mirror_feedfrequency = 120
+    scan_freq = int(mirror_feedfrequency/3)
 
     sampling_rate = 200000.0  # Samples per second
-    num_samples = int(sampling_rate/scan_freq) # Number of samples to acquire after each trigger
+    # Number of samples to acquire after each trigger
+    num_samples = int(sampling_rate/scan_freq)
     trigger_timeout = 5.0  # Timeout in seconds to wait for each trigger
-    num_repetitions = 500  # Number of times to repeat the acquisition
+    num_repetitions = 10  # Number of times to repeat the acquisition
     repetition_to_plot = 1  # The repetition number to plot (1-based index)
-    delaytimer=0.01
-    
+    delaytimer = 0.01
 
     colors = plt.get_cmap('viridis', num_repetitions)
 
     # --- Perform Repeated Acquisition ---
     all_recorded_data = []
     time.sleep(5)
-    
-    for i in range(num_repetitions):
-        print(f"\n--- Repetition {i+1} ---")
-        acquired_data = record_on_low_digital_trigger(
-            analog_data_channel,
-            digital_trigger_channel,
-            num_samples,
-            sampling_rate,
-            trigger_timeout,
-        )
-        time.sleep(delaytimer)
-        if acquired_data is not None:
-            all_recorded_data.append(acquired_data)
-        else:
-            print(f"Data acquisition failed for repetition {i+1}.")
+    for icurlaser in range(len(lasernumber)):
+        control_laser(lasernumber[icurlaser],turn_on=True)  
+        time.sleep(2) 
+        for i in range(num_repetitions):
+            print(f"\n--- Repetition {i+1} ---")
+            acquired_data = record_on_low_digital_trigger(
+                analog_data_channel,
+                digital_trigger_channel,
+                num_samples,
+                sampling_rate,
+                trigger_timeout,
+            )
+            time.sleep(delaytimer)
+            if acquired_data is not None:
+                all_recorded_data.append(acquired_data)
+            else:
+                print(f"Data acquisition failed for repetition {i+1}.")
 
     # --- Plot as an Image and Plot One Repetition ---
-    if all_recorded_data:
-        output_matrix = np.array(all_recorded_data)
+        if all_recorded_data:
+            output_matrix = np.array(all_recorded_data)
 
         # Image Plot
-        plt.figure(figsize=(12, 6))
-        plt.subplot(1, 2, 1)  # Create a subplot for the image
-        plt.imshow(
-            np.flipud(output_matrix),
-            aspect="auto",
-            cmap="viridis",
-            extent=[0, num_samples / sampling_rate, 0, num_repetitions],
-        )
-        plt.colorbar(label="Voltage (V)")
-        plt.xlabel("Time (s)")
-        plt.ylabel("Repetition Number")
-        plt.title("Acquired Data as Image Over Multiple Triggers")
-        plt.grid(False)
-
-        #Line Plot of One Repetition
-        plt.subplot(1, 2, 2)  # Create a subplot for the line plot
-        if 1 <= repetition_to_plot <= len(all_recorded_data):
-            data_to_plot = all_recorded_data[repetition_to_plot - 1]
-            time = np.linspace(
-                0, num_samples / sampling_rate, num_samples, endpoint=False
+            plt.figure(figsize=(12, 6))
+            plt.subplot(1, 2, 1)  # Create a subplot for the image
+            plt.imshow(
+                np.flipud(output_matrix),
+                aspect="auto",
+                cmap="viridis",
+                extent=[0, num_samples / sampling_rate, 0, num_repetitions],
             )
-            for i, data in enumerate(all_recorded_data):
-                color = colors(i)  # Get a color from the colormap
-                plt.plot(time, data, label=f"Repetition {i+1}", color=color)
-
+            plt.colorbar(label="Voltage (V)")
             plt.xlabel("Time (s)")
-            plt.ylabel("Voltage (V)")
-            plt.title(f"Acquired Data for Repetition {repetition_to_plot}")
-            plt.grid(True)
-        else:
-            print(
-                f"Invalid repetition number specified for plotting: {repetition_to_plot}. "
-                f"Please choose a value between 1 and {len(all_recorded_data)}."
-            )
+            plt.ylabel("Repetition Number")
+            plt.title(f"Acquired Data as Image Over Multiple Triggers at wavelength {laserwave[icurlaser]}")
+            plt.grid(False)
 
-        plt.tight_layout()  # Adjust subplot parameters for a tight layout
-        plt.show()
-    else:
-        print("No data was successfully acquired.")
+            # Line Plot of One Repetition
+            plt.subplot(1, 2, 2)  # Create a subplot for the line plot
+            if 1 <= repetition_to_plot <= len(all_recorded_data):
+                data_to_plot = all_recorded_data[repetition_to_plot - 1]
+                timex = np.linspace(
+                    0, num_samples / sampling_rate, num_samples, endpoint=False
+                )
+                for i, data in enumerate(all_recorded_data):
+                    color = colors(i)  # Get a color from the colormap
+                    plt.plot(timex, data, label=f"Repetition {i+1}", color=color)
+
+                plt.xlabel("Time (s)")
+                plt.ylabel("Voltage (V)")
+                plt.title(f"Acquired Data for Repetition {repetition_to_plot} at wavelength {laserwave[icurlaser]}")
+                plt.grid(True)
+            else:
+                print(
+                    f"Invalid repetition number specified for plotting: {repetition_to_plot}. "
+                    f"Please choose a value between 1 and {len(all_recorded_data)}."
+                )
+
+            plt.tight_layout()  # Adjust subplot parameters for a tight layout
+            plt.show()
+            control_laser(lasernumber[icurlaser],turn_on=False)
+        else:
+            print("No data was successfully acquired.")

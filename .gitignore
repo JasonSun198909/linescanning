@@ -1,0 +1,5 @@
+# Python
+__pycache__/
+*.pyc
+linescan/
+acquired_laser_data/

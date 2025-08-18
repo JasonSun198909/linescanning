@@ -1,5 +1,5 @@
 # Python
 __pycache__/
 *.pyc
-linescan/
+.linescan/
 acquired_laser_data/

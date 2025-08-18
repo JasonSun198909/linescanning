@@ -1,5 +1,6 @@
 {
     "[python]": {
         "editor.defaultFormatter": "ms-python.autopep8"
-    }
+    },
+    "python.pythonPath": "\\\\rua-file\\HOME$\\rualoptical2\\My Documents\\ContainerScanningScripts\\linescanning\\linescan\\Scripts\\python.exe"
 }

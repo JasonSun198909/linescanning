@@ -143,7 +143,7 @@ if __name__ == "__main__":
             # Reset data storage for each laser
             all_recorded_data = [] 
 
-            control_laser(lasernumber[icurlaser], turn_on=True)  
+            control_laser(lasernumber[icurlaser], turn_on=False)  
             time.sleep(1) # Wait for laser to stabilize
             send_serial_command('COM4',veticalshift)
 

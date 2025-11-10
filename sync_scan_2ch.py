@@ -11,58 +11,6 @@ from control_laser import control_laser # Assuming this module exists and works
 import os # Import the os module for path manipulation
 from connectStepper import send_serial_command
 
-# def record_on_low_digital_trigger(
-#     data_channel, trigger_line, samples_per_channel, rate, timeout=10.0
-# ):
-#     """
-#     Records analog data using NI-DAQmx after a digital trigger on the specified line goes low.
-
-#     Args:
-#         data_channel (str): The analog input channel for data acquisition (e.g., "Dev1/ai0").
-#         trigger_line (str): The digital input line for the trigger (e.g., "Dev1/PFI0").
-#         samples_per_channel (int): The number of samples to acquire per channel.
-#         rate (float): The sampling rate in samples per second per channel.
-#         timeout (float): The maximum time in seconds to wait for the trigger.
-
-#     Returns:
-#         numpy.ndarray or None: The acquired analog data, or None if a timeout occurs.
-#     """
-#     data = None
-#     try:
-#         with nidaqmx.Task() as task:
-#             task.ai_channels.add_ai_voltage_chan(data_channel)
-#             task.timing.cfg_samp_clk_timing(
-#                 rate, sample_mode=AcquisitionType.FINITE, samps_per_chan=samples_per_channel
-#             )
-
-#             # Configure digital edge start trigger
-#             task.triggers.start_trigger.cfg_dig_edge_start_trig(
-#                 trigger_line, trigger_edge=Edge.FALLING
-#             )
-
-#             print(
-#                 f"Waiting for a low-going digital trigger on {trigger_line}...")
-#             task.start()
-
-#             try:
-#                 data = task.read(
-#                     number_of_samples_per_channel=samples_per_channel, timeout=timeout
-#                 )
-#                 print("Data acquisition complete for this trigger.")
-#             except nidaqmx.errors.DAQmxTimeoutError:
-#                 print(
-#                     "Timeout occurred while waiting for trigger or acquiring data."
-#                 )
-#             except Exception as e:
-#                 print(f"An error occurred during data acquisition: {e}")
-
-#     except nidaqmx.errors.DaqError as e:
-#         print(f"NI-DAQmx Error: {e}")
-#     except Exception as e:
-#         print(f"An unexpected error occurred: {e}")
-#     finally:
-#         return np.array(data) if data is not None else None
-
 
 if __name__ == "__main__":
     # --- User Configuration ---
